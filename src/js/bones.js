@@ -12,7 +12,7 @@ export class Bones extends Actor {
             Math.random() * 1280,
             Math.random() * 720
         )
-        this.vel = new Vector(0, 1 + Math.random() * 150)
+        this.vel = new Vector(0, 25 + Math.random() * 120)
         const boneScale = 0.2 + Math.random() * 0.8
         this.scale = new Vector(boneScale, boneScale)
         this.events.on("exitviewport", (e) => this.bonesLeft())
@@ -21,7 +21,7 @@ export class Bones extends Actor {
     bonesLeft() {
         this.pos = new Vector(
             Math.random() * 1280,
-            -50
+            -70
         )
     }
 }

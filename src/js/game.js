@@ -4,6 +4,7 @@ import { Resources, ResourceLoader } from './resources.js'
 import { Fish } from './fish.js'
 import { Bones } from './bones.js'
 import { Shark } from './shark.js'
+import { Bubble } from './bubble.js'
 
 export class Game extends Engine {
 
@@ -41,6 +42,11 @@ export class Game extends Engine {
         for (let i = 0; i < 15; i++) {
             const shark = new Shark()
             this.add(shark)
+        }
+
+        for (let i = 0; i < 10; i++) {
+            const bubble = new Bubble()
+            this.add(bubble)
         }
     }
 }

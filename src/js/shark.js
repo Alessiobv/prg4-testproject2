@@ -12,7 +12,7 @@ export class Shark extends Actor {
             Math.random() * 1280,
             Math.random() * 720
         )
-        this.vel = new Vector(1 + Math.random() * 150, 0)
+        this.vel = new Vector(25 + Math.random() * 120, 0)
         const sharkScale = 0.2 + Math.random() * 0.8
         this.scale = new Vector(sharkScale, sharkScale)
         this.events.on("exitviewport", (e) => this.sharkLeft())
@@ -20,7 +20,7 @@ export class Shark extends Actor {
 
     sharkLeft() {
         this.pos = new Vector(
-            -50,
+            -70,
             Math.random() * 720
         )
     }
