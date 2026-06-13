@@ -2,11 +2,10 @@
 import { Resources } from "../resources.js"
 
 export class Player extends Actor {
-
+    
     player
     score = 0
     health = 100
-    swimSpeed = 200
 
     constructor(x, y) {
         super({
@@ -17,7 +16,7 @@ export class Player extends Actor {
         })
 
         this.speed = 150;
-        this.facing = 'down';
+        this.facingVector = new Vector(0, 1)
     }
 
     onInitialize() {
@@ -51,58 +50,87 @@ export class Player extends Actor {
         this.graphics.use(this.animations.idleDown);
     }
     onPreUpdate(engine, delta) {
-        this.vel = Vector.Zero;
-        const kb = engine.input.keyboard;
-        let moving = false;
+        this.vel = Vector.Zero
+        const kb = engine.input.keyboard
+        let moving = false
+
+        let dirX = 0;
+        let dirY = 0;
         
         if (kb.isHeld(Keys.ArrowLeft) || kb.isHeld(Keys.A)) {
             this.vel.x = -this.speed;
             this.facing = 'left';
+            dirX = -1;
             moving = true;
         } else if (kb.isHeld(Keys.ArrowRight) || kb.isHeld(Keys.D)) {
             this.vel.x = this.speed;
             this.facing = 'right';
+            dirX = 1;
             moving = true;
         }
-        
+
         if (kb.isHeld(Keys.ArrowUp) || kb.isHeld(Keys.W)) {
             this.vel.y = -this.speed;
             this.facing = 'up';
+            dirY = -1;
             moving = true;
         } else if (kb.isHeld(Keys.ArrowDown) || kb.isHeld(Keys.S)) {
             this.vel.y = this.speed;
             this.facing = 'down';
+            dirY = 1;
             moving = true;
         }
         
         if (moving) {
             if (this.facing === 'left') {
-                this.graphics.use(this.animations.walkLeft);
-                this.graphics.flipHorizontal = false;
+                this.graphics.use(this.animations.walkLeft)
+                this.graphics.flipHorizontal = false
+                this.facingVector = new Vector(dirX, dirY).normalize();
             } else if (this.facing === 'right') {
-                this.graphics.use(this.animations.walkLeft);
-                this.graphics.flipHorizontal = true;
+                this.graphics.use(this.animations.walkLeft)
+                this.graphics.flipHorizontal = true
+                this.facingVector = new Vector(dirX, dirY).normalize();
             } else if (this.facing === 'up') {
-                this.graphics.use(this.animations.walkUp);
-                this.graphics.flipHorizontal = false;
+                this.graphics.use(this.animations.walkUp)
+                this.graphics.flipHorizontal = false
+                this.facingVector = new Vector(dirX, dirY).normalize();
             } else if (this.facing === 'down') {
-                this.graphics.use(this.animations.walkDown);
-                this.graphics.flipHorizontal = false;
+                this.graphics.use(this.animations.walkDown)
+                this.graphics.flipHorizontal = false
+                this.facingVector = new Vector(dirX, dirY).normalize();
             }
         } else {
             if (this.facing === 'left') {
-                this.graphics.use(this.animations.idleLeft);
-                this.graphics.flipHorizontal = false;
+                this.graphics.use(this.animations.idleLeft)
+                this.graphics.flipHorizontal = false
             } else if (this.facing === 'right') {
-                this.graphics.use(this.animations.idleLeft);
-                this.graphics.flipHorizontal = true;
+                this.graphics.use(this.animations.idleLeft)
+                this.graphics.flipHorizontal = true
             } else if (this.facing === 'up') {
-                this.graphics.use(this.animations.idleUp);
-                this.graphics.flipHorizontal = false;
+                this.graphics.use(this.animations.idleUp)
+                this.graphics.flipHorizontal = false
             } else if (this.facing === 'down') {
-                this.graphics.use(this.animations.idleDown);
+                this.graphics.use(this.animations.idleDown)
                 this.graphics.flipHorizontal = false;
             }
+        }
+        
+        const mapWidth = 4110
+        const mapHeight = 4110
+        
+        const halfWidth = this.width / 2
+        const halfHeight = this.height / 2
+        
+        if (this.pos.x < halfWidth){
+            this.pos.x = halfWidth
+        } else if (this.pos.x > mapWidth - halfWidth){
+            this.pos.x = mapWidth - halfWidth;
+        }
+
+        if (this.pos.y < halfHeight){
+            this.pos.y = halfHeight
+        } else if (this.pos.y > mapHeight - halfHeight){
+            this.pos.y = mapHeight - halfHeight;
         }
     }
 }
