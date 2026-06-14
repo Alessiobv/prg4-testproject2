@@ -12,11 +12,42 @@ export class SpawnManager {
     constructor(scene, player) {
         this.scene = scene
         this.player = player
-
-        this.spawnInterval = 1000
+        
+        this.baseInterval = 3000
+        this.minInterval = 500
+        
+        this.difficultyTimer = 0
+        this.difficultyIncreaseRate = 30000
+        
         this.timer = 0
-
         this.active = false
+
+        this.spawnTable = [
+            { type: TreeMS1, weight: 30 },
+            { type: TreeMS2, weight: 30 },
+            { type: TreeMS3, weight: 30 },
+
+            { type: TreeMB1, weight: 10 },
+            { type: TreeMB2, weight: 10 },
+            { type: TreeMB3, weight: 10 },
+
+            { type: Boss, weight: 2 }
+        ]
+    }
+
+    pickEnemy() {
+        const totalWeight = this.spawnTable.reduce((sum, item) => sum + item.weight, 0)
+
+        let random = Math.random() * totalWeight
+
+        for (const item of this.spawnTable) {
+            if (random < item.weight) {
+                return item.type
+            }
+            random -= item.weight
+        }
+
+        return this.spawnTable[0].type
     }
 
     start() {
@@ -32,9 +63,20 @@ export class SpawnManager {
 
         this.timer += delta
 
-        if (this.timer >= this.spawnInterval) {
+        if (this.timer >= this.baseInterval) {
             this.timer = 0
             this.spawnEnemy()
+        }
+        
+        this.difficultyTimer += delta
+        if(this.difficultyTimer >= this.difficultyIncreaseRate) {
+            this.difficultyTimer = 0
+            this.baseInterval -= 200
+            
+            if(this.baseInterval < this.minInterval) {
+                this.baseInterval = this.minInterval
+            }
+            console.log("Spawn Rate Increased:", this.baseInterval)
         }
     }
 
@@ -45,10 +87,10 @@ export class SpawnManager {
 
         let x = 0
         let y = 0
-        
+
         if (side === 0) {
             x = Math.random() * mapSize
-            y = 0;
+            y = 0
         } else if (side === 1) {
             x = mapSize
             y = Math.random() * mapSize
@@ -60,10 +102,7 @@ export class SpawnManager {
             y = Math.random() * mapSize
         }
 
-        const types = [TreeMS1, TreeMS2, TreeMS3, TreeMB1, TreeMB2, TreeMB3, Boss]
-        const EnemyClass = types[Math.floor(Math.random() * types.length)]
-
-        console.log("SPAWNING:", EnemyClass.name)
+        const EnemyClass = this.pickEnemy()
 
         const enemy = new EnemyClass(x, y)
 

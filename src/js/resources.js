@@ -1,7 +1,8 @@
-import { ImageSource, Loader } from 'excalibur'
+import { ImageSource, Loader } from "excalibur"
 
 // voeg hier jouw eigen resources toe
 const Resources = {
+    GameOver: new ImageSource('./images/GameOver.png'),
     Background: new ImageSource('./images/BackgroundZelda.png'),
     LinkAttack: new ImageSource('./images/LinkAttackSprite.png'),
     LinkDownWalk: new ImageSource('./images/LinkDownWalk.png'),

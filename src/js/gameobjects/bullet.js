@@ -1,5 +1,5 @@
-﻿import { Actor, Vector, SpriteSheet, Animation, CollisionType } from 'excalibur'
-import { Resources } from '../resources.js'
+﻿import { Actor, Vector, SpriteSheet, Animation, CollisionType } from "excalibur"
+import { Resources } from "../resources.js"
 
 export class Bullet extends Actor {
     constructor(startX, startY, directionVector){

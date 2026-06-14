@@ -1,4 +1,4 @@
-﻿import { Actor, Vector, CollisionType } from "excalibur";
+﻿import { Actor, Vector, CollisionType } from "excalibur"
 
 export class Enemy extends Actor {
     constructor(x, y, config) {
@@ -7,37 +7,40 @@ export class Enemy extends Actor {
             width: config.width || 32,
             height: config.height || 32,
             collisionType: config.collisionType || CollisionType.Active
-        });
+        })
 
-        this.hp = config.hp || 10;
-        this.speed = config.speed || 50;
-        this.playerInContact = false;
-        this.attackCooldown = 750;
-        this.attackTimer = 0;
+        this.hp = config.hp || 10
+        this.speed = config.speed || 50
+        this.playerInContact = false
+        this.attackCooldown = 250
+        this.attackTimer = 0
     }
 
     onInitialize(engine) {
         this.on("collisionstart", (evt) => {
-            const otherActor = evt.other.owner;
+            const other = evt.other?.owner
 
-            if (otherActor?.constructor?.name === "Player") {
-                this.playerInContact = true;
-                this.contactTarget = otherActor;
+            if (!other) return
+
+            if (other.constructor?.name === "Player") {
+                this.playerInContact = true
+                this.contactTarget = other
+                this.attackTimer = 0
             }
 
-            if (otherActor?.tags?.has("bullet")) {
-                this.takeDamage(otherActor.damage || 10);
-                otherActor.kill();
+            if (other.hasTag?.("bullet")) {
+                this.takeDamage(other.damage || 10)
+                other.kill()
             }
         })
-        
-        this.on("collisionend", (evt) => {
-            const otherActor = evt.other.owner;
 
-            if (otherActor?.constructor?.name === "Player") {
-                this.playerInContact = false;
-                this.contactTarget = null;
-                this.attackTimer = 0;
+        this.on("collisionend", (evt) => {
+            const other = evt.other?.owner
+
+            if (other?.constructor?.name === "Player") {
+                this.playerInContact = false
+                this.contactTarget = null
+                this.attackTimer = 0
             }
         })
     }
@@ -45,52 +48,62 @@ export class Enemy extends Actor {
     onPreUpdate(engine, delta) {
         const player = engine.currentScene.actors.find(
             actor => actor.constructor.name === "Player"
-        );
+        )
 
         if (player) {
-            const diff = player.pos.sub(this.pos);
+            const diff = player.pos.sub(this.pos)
 
             if (diff.magnitude > 0) {
-                const direction = diff.normalize();
-                this.vel = direction.scale(this.speed);
+                const direction = diff.normalize()
+                this.vel = direction.scale(this.speed)
             } else {
-                this.vel = Vector.Zero;
+                this.vel = Vector.Zero
             }
         }
 
         if (this.playerInContact && this.contactTarget) {
-            this.attackTimer += delta;
+            this.attackTimer += delta
 
             if (this.attackTimer >= this.attackCooldown) {
-                this.attackTimer = 0;
+                this.attackTimer = 0
 
-                console.log("Enemy attacks player");
-
-                if (typeof this.contactTarget.takeDamage === "function") {
-                    this.contactTarget.takeDamage(10);
+                if (this.contactTarget.takeDamage) {
+                    this.contactTarget.takeDamage(10, this.engine)
                 }
             }
         }
 
         if (this.vel.x < 0) {
-            this.graphics.flipHorizontal = true;
+            this.graphics.flipHorizontal = true
         } else if (this.vel.x > 0) {
-            this.graphics.flipHorizontal = false;
+            this.graphics.flipHorizontal = false
         }
     }
 
     takeDamage(amount) {
-        this.hp -= amount;
+        this.hp -= amount
 
-        console.log(`${this.constructor.name} HP: ${this.hp}`);
+        console.log(`${this.constructor.name} HP: ${this.hp}`)
 
         if (this.hp <= 0) {
-            this.die();
+            this.die()
         }
     }
 
+    getScoreValue() {
+        return 10
+    }
+
     die() {
-        console.log(`${this.constructor.name} died`);
-        this.kill();
+        console.log(`${this.constructor.name} has been defeated`)
+        
+        const scene = this.scene
+        const player = scene?.actors?.find(a => a.constructor.name === "Player")
+
+        if (player?.addScore) {
+            player.addScore(this.getScoreValue())
+        }
+
+        this.kill()
     }
 }

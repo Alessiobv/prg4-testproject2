@@ -68,5 +68,9 @@ export class Boss extends Enemy {
             this.graphics.flipHorizontal = false
         }
     }
+
+    getScoreValue() {
+        return 100
+    }
 }
 

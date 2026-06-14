@@ -1,11 +1,14 @@
-﻿import { Scene, Actor, Vector, BoundingBox } from "excalibur"
+﻿import { Scene, Actor, Vector, BoundingBox, Label, Font, Color } from "excalibur"
 import { Player } from "../gameobjects/player.js"
 import { Bullet } from "../gameobjects/bullet.js"
-import { Resources } from '../resources.js'
+import { Resources } from "../resources.js"
 import { SpawnManager } from "../SpawnManager.js"
+import { HUD } from "../HUD.js"
 
 export class LevelOne extends Scene {
     onInitialize(engine) {
+        this.gameOver = false
+
         const mapWidth = 4110
         const mapHeight = 4110
 
@@ -24,26 +27,52 @@ export class LevelOne extends Scene {
         this.player = new Player(centerX, centerY)
         this.add(this.player)
 
-        this.spawnManager = new SpawnManager(this, this.player);
-        this.spawnManager.start();
+        this.hud = new HUD(this, this.player)
+
+        this.spawnManager = new SpawnManager(this, this.player)
+        this.spawnManager.start()
 
         this.camera.strategy.elasticToActor(this.player, 0.1, 0.1)
-        this.camera.strategy.limitCameraBounds(new BoundingBox(0, 0, mapWidth, mapHeight))
-        
-        engine.input.pointers.primary.on('down', (evt) => {
-            const spawnOffset = this.player.facingVector.scale(24)
-            let spawnX = this.player.pos.x + spawnOffset.x
-            const spawnY = this.player.pos.y + spawnOffset.y
+        this.camera.strategy.limitCameraBounds(
+            new BoundingBox(0, 0, mapWidth, mapHeight)
+        )
 
-            if (this.player.facingVector.y === -1 && this.player.facingVector.x === 0) {
-                spawnX -= 8
-            }
-            const bullet = new Bullet(spawnX, spawnY, this.player.facingVector)
-            engine.currentScene.add(bullet)
+        engine.input.pointers.primary.on('down', () => {
+            if (this.gameOver) return
+            
+            const spawnOffset = this.player.facingVector.scale(24)
+
+            const bullet = new Bullet(
+                this.player.pos.x + spawnOffset.x,
+                this.player.pos.y + spawnOffset.y,
+                this.player.facingVector
+            );
+
+            this.add(bullet)
         })
     }
 
     onPreUpdate(engine, delta) {
-        this.spawnManager.update(engine, delta);
+        if (this.gameOver) return
+
+        this.spawnManager.update(engine, delta)
+        this.hud.update()
+    }
+
+    triggerGameOver(score) {
+        if (this.gameOver) return
+
+        this.gameOver = true
+        this.spawnManager?.stop?.()
+        
+        const currentHigh = Number(localStorage.getItem("highscore") ?? 0)
+
+        if (score > currentHigh) {
+            localStorage.setItem("highscore", score)
+        }
+
+        this.engine.gameOverScore = score
+
+        this.engine.goToScene("gameover")
     }
 }

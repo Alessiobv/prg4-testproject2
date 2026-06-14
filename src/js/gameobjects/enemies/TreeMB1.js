@@ -2,7 +2,6 @@
 import { Enemy } from "../enemy.js"
 import { Resources } from "../../resources.js"
 
-
 export class TreeMB1 extends Enemy {
     constructor(x, y){
         super(x, y, {
@@ -67,6 +66,10 @@ export class TreeMB1 extends Enemy {
         } else if (this.vel.x > 0) {
             this.graphics.flipHorizontal = false
         }
+    }
+
+    getScoreValue() {
+        return 25
     }
 }
 

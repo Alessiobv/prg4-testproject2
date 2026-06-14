@@ -68,5 +68,9 @@ export class TreeMB3 extends Enemy {
             this.graphics.flipHorizontal = false
         }
     }
+
+    getScoreValue() {
+        return 25
+    }
 }
 
