@@ -81,7 +81,7 @@ export class SpawnManager {
     }
 
     spawnEnemy() {
-        const mapSize = 4110
+        const mapSize = 4000
 
         const side = Math.floor(Math.random() * 4)
 
