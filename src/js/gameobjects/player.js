@@ -21,6 +21,7 @@ export class Player extends Actor {
         this.addTag('Player')
         this.speed = 150
         this.facingVector = new Vector(0, 1)
+        this.facing = 'down'
     }
 
     onInitialize() {

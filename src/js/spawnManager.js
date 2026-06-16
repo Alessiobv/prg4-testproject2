@@ -80,8 +80,8 @@ export class SpawnManager {
         }
     }
 
-    spawnEnemy() {
-        const mapSize = 4000
+    spawnEnemy(engine) {
+        const mapSize = 4110
 
         const side = Math.floor(Math.random() * 4)
 
@@ -104,7 +104,10 @@ export class SpawnManager {
 
         const EnemyClass = this.pickEnemy()
 
-        const enemy = new EnemyClass(x, y)
+        const enemy = new EnemyClass(x, y, {
+            engine,
+            player: this.player
+        })
 
         this.scene.add(enemy)
     }

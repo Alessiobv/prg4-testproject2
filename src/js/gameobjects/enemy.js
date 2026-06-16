@@ -13,19 +13,25 @@ export class Enemy extends Actor {
         this.ammoDrop = config.ammoDrop || 5
         this.hp = config.hp || 10
         this.speed = config.speed || 50
+
         this.playerInContact = false
+        this.contactTarget = null
         this.attackCooldown = 250
         this.attackTimer = 0
-        this.addTag('Enemy')
+
+        this.player = null
+
+        this.addTag("Enemy")
     }
 
     onInitialize(engine) {
-        this.on("collisionstart", (evt) => {
-            const other = evt.other?.owner
+        this.player = engine.currentScene.actors.find(a => a.hasTag("Player"))
 
+        this.on("collisionstart", evt => {
+            const other = evt.other?.owner
             if (!other) return
 
-            if (other.hasTag('Player')) {
+            if (other.hasTag("Player")) {
                 this.playerInContact = true
                 this.contactTarget = other
                 this.attackTimer = 0
@@ -37,10 +43,11 @@ export class Enemy extends Actor {
             }
         })
 
-        this.on("collisionend", (evt) => {
+        this.on("collisionend", evt => {
             const other = evt.other?.owner
+            if (!other) return
 
-            if (other.hasTag('Player')) {
+            if (other.hasTag("Player")) {
                 this.playerInContact = false
                 this.contactTarget = null
                 this.attackTimer = 0
@@ -49,9 +56,11 @@ export class Enemy extends Actor {
     }
 
     onPreUpdate(engine, delta) {
-        const player = engine.currentScene.actors.find(
-            actor => actor.hasTag('Player')
-        )
+        if (!this.player) {
+            this.player = engine.currentScene.actors.find(a => a.hasTag("Player"))
+        }
+
+        const player = this.player
 
         if (player) {
             const diff = player.pos.sub(this.pos)
@@ -99,19 +108,19 @@ export class Enemy extends Actor {
 
     die() {
         console.log(`${this.constructor.name} has been defeated`)
-        
-        const scene = this.scene
-        const player = scene?.actors?.find(a => a.hasTag('Player'))
+
+        const engine = this.scene?.engine
+        const player = engine?.currentScene?.actors.find(a => a.hasTag("Player"))
 
         if (player?.addScore) {
             player.addScore(this.getScoreValue())
         }
-        
+
         const dropChance = 0.5
-        
-        if (Math.random() < dropChance){
+
+        if (Math.random() < dropChance) {
             const ammoPickup = new AmmoPickup(this.pos.x, this.pos.y, this.ammoDrop)
-            this.scene.add(ammoPickup)
+            engine?.currentScene?.add(ammoPickup)
         }
 
         this.kill()
