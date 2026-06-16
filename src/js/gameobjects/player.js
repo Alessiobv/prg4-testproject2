@@ -17,7 +17,8 @@ export class Player extends Actor {
             height: 32,
             collisionType: CollisionType.Active
         })
-
+        
+        this.addTag('Player')
         this.speed = 150
         this.facingVector = new Vector(0, 1)
     }

@@ -16,6 +16,7 @@ export class Enemy extends Actor {
         this.playerInContact = false
         this.attackCooldown = 250
         this.attackTimer = 0
+        this.addTag('Enemy')
     }
 
     onInitialize(engine) {
@@ -24,7 +25,7 @@ export class Enemy extends Actor {
 
             if (!other) return
 
-            if (other.constructor?.name === "Player") {
+            if (other.hasTag('Player')) {
                 this.playerInContact = true
                 this.contactTarget = other
                 this.attackTimer = 0
@@ -39,7 +40,7 @@ export class Enemy extends Actor {
         this.on("collisionend", (evt) => {
             const other = evt.other?.owner
 
-            if (other?.constructor?.name === "Player") {
+            if (other.hasTag('Player')) {
                 this.playerInContact = false
                 this.contactTarget = null
                 this.attackTimer = 0
@@ -49,7 +50,7 @@ export class Enemy extends Actor {
 
     onPreUpdate(engine, delta) {
         const player = engine.currentScene.actors.find(
-            actor => actor.constructor.name === "Player"
+            actor => actor.hasTag('Player')
         )
 
         if (player) {
@@ -100,7 +101,7 @@ export class Enemy extends Actor {
         console.log(`${this.constructor.name} has been defeated`)
         
         const scene = this.scene
-        const player = scene?.actors?.find(a => a.constructor.name === "Player")
+        const player = scene?.actors?.find(a => a.hasTag('Player'))
 
         if (player?.addScore) {
             player.addScore(this.getScoreValue())
